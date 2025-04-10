@@ -33,13 +33,23 @@ export class CanvasManager {
     return style.lineHeight ? style.lineHeight : textHeight * 1.2;
   }
 
-  private wrapText(text: string, maxWidth: number): string[] {
+  private wrapText(text: string, maxWidth: number): { lines: string[], lineBreaks: number[] } {
+    // Split text into paragraphs by line breaks
     const paragraphs = text.split('\n');
     const lines: string[] = [];
+    const lineBreaks: number[] = [];
+    let charCount = 0;
 
-    paragraphs.forEach(paragraph => {
+    paragraphs.forEach((paragraph, pIndex) => {
+      // Track line break positions
+      if (pIndex > 0) {
+        lineBreaks.push(charCount);
+      }
+      charCount += (pIndex > 0 ? 1 : 0); // Account for \n character
+
       if (paragraph === '') {
         lines.push('');
+        charCount++;
         return;
       }
 
@@ -48,6 +58,7 @@ export class CanvasManager {
       // Handle single word case
       if (words.length === 0) {
         lines.push('');
+        charCount++;
         return;
       }
 
@@ -69,21 +80,27 @@ export class CanvasManager {
             }
           }
           lines.push(currentLine);
+          charCount += words[0].length;
           return;
         }
         lines.push(words[0]);
+        charCount += words[0].length;
         return;
       }
 
       // Handle multiple words
       let currentLine = words[0];
+      charCount += words[0].length;
+
       for (let i = 1; i < words.length; i++) {
         const width = this.ctx.measureText(currentLine + ' ' + words[i]).width;
         if (width < maxWidth) {
           currentLine += ' ' + words[i];
+          charCount += words[i].length + 1; // +1 for space
         } else {
           lines.push(currentLine);
           currentLine = words[i];
+          charCount += words[i].length;
         }
       }
       if (currentLine) {
@@ -91,7 +108,7 @@ export class CanvasManager {
       }
     });
 
-    return lines;
+    return { lines, lineBreaks };
   }
   
   public isInEditMode(): boolean {
@@ -182,20 +199,18 @@ export class CanvasManager {
       this.ctx.fillStyle = this.currentStyle.color || "black";
       if (this.currentStyle.italic) this.ctx.font = `italic ${this.ctx.font}`;
 
-      const maxWidth = this.width * 0.8; // Use 80% of canvas width
-      const lines = this.wrapText(text, maxWidth);
+      const maxWidth = this.width * 0.8;
+      const { lines, lineBreaks } = this.wrapText(text, maxWidth);
       const metrics = this.ctx.measureText('M');
       const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
       const lineHeight = this.getLineHeight(this.currentStyle, textHeight);
       const totalHeight = lines.length * lineHeight;
       
-      // Calculate vertical position for the entire text block
       const startY = this.height / 2 - totalHeight / 2;
       
-      // Track cursor position
+      // Track cursor position for editing
       let cursorLine = 0;
       let cursorX = 0;
-      let currentTextLength = 0;
       
       // Draw each line
       lines.forEach((line, index) => {
@@ -204,19 +219,20 @@ export class CanvasManager {
         let lineWidth = lineMetrics.width;
         const x = this.width / 2;
 
-        // Track cursor position if we're in edit mode
+        // Calculate cursor position if we're in edit mode
         if (this.isEditing) {
-          currentTextLength += line.length + (index > 0 ? 1 : 0); // +1 for newline
-          if (currentTextLength >= this.editingText.length) {
-            if (cursorLine === 0) { // Only set these once
-              cursorLine = index;
-              const textBeforeCursor = line.substring(0, line.length - (currentTextLength - this.editingText.length));
-              let cursorOffset = this.ctx.measureText(textBeforeCursor).width;
-              if (this.currentStyle?.letterSpacing) {
-                cursorOffset += this.currentStyle.letterSpacing * textBeforeCursor.length;
-              }
-              cursorX = this.width / 2 - lineWidth / 2 + cursorOffset;
-            }
+          // Find where the cursor should be based on lineBreaks
+          const currentPosition = this.editingText.length;
+          const isBreakBeforeCursor = lineBreaks.some((breakPos) => breakPos === currentPosition - 1);
+          
+          if (isBreakBeforeCursor && index === lines.length - 1) {
+            cursorLine = index;
+            cursorX = this.width / 2 - lineWidth / 2;
+          } else if (index === lines.length - 1) {
+            cursorLine = index;
+            let lastLineContent = line;
+            const cursorOffset = this.ctx.measureText(lastLineContent).width;
+            cursorX = this.width / 2 - lineWidth / 2 + cursorOffset;
           }
         }
 
@@ -373,7 +389,7 @@ export class CanvasManager {
     if (style.italic) this.ctx.font = `italic ${this.ctx.font}`;
     
     const maxWidth = this.width * 0.8; // Use 80% of canvas width
-    const lines = this.wrapText(text, maxWidth);
+    const { lines } = this.wrapText(text, maxWidth);
     const metrics = this.ctx.measureText('M');
     const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
     const lineHeight = this.getLineHeight(style, textHeight);
@@ -381,7 +397,7 @@ export class CanvasManager {
     
     const startY = y - totalHeight / 2;
     
-    lines.forEach((line, index) => {
+    lines.forEach((line: string, index: number) => {
       const lineY = startY + (index * lineHeight) + textHeight;
       const lineMetrics = this.ctx.measureText(line);
       let lineWidth = lineMetrics.width;
