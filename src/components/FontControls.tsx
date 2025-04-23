@@ -324,7 +324,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
                       onValueChange={handleKerningChange}
                   />
               </div>
-      />
+      
     </Form>
           </AccordionContent>
         </AccordionItem>
