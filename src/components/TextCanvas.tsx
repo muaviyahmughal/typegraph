@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import {Textarea} from "@/components/ui/textarea";
 
 interface TextCanvasProps {
   selectedFont: string | null;
@@ -19,7 +20,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
   return (
     <div className="flex flex-col h-full border rounded-md p-4">
       <h2 className="text-xl font-semibold mb-2">Text Canvas</h2>
-      <textarea
+      <Textarea
         className="flex-grow w-full border rounded-md p-2 resize-none"
         value={text}
         onChange={handleChange}
@@ -31,9 +32,6 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
           textDecoration: underline ? 'underline' : 'none',
         }}
       />
-      <p className="mt-2">
-        Selected Font: {selectedFont || 'Default'}
-      </p>
     </div>
   );
 };
