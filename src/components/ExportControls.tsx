@@ -1,5 +1,6 @@
 import React from 'react';
 import {Button} from "@/components/ui/button";
+import {fabric} from 'fabric';
 
 interface ExportControlsProps {
   text: string;
@@ -13,10 +14,14 @@ interface ExportControlsProps {
 export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFont, bold, italic, underline, kerning}) => {
 
   const handleSvgExport = () => {
-    // Create SVG content
-    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">
-      <text x="10" y="50" font-family="${selectedFont || 'Arial'}" font-size="20" font-weight="${bold ? 'bold' : 'normal'}" font-style="${italic ? 'italic' : 'normal'}" text-decoration="${underline ? 'underline' : 'none'}" letter-spacing="${kerning / 100}em">${text}</text>
-    </svg>`;
+    const canvasElement = document.querySelector('canvas');
+    if (!canvasElement) {
+      alert("Canvas not found!");
+      return;
+    }
+
+    const fabricCanvas = new fabric.Canvas(canvasElement);
+    const svgContent = fabricCanvas.toSVG();
 
     const blob = new Blob([svgContent], {type: 'image/svg+xml'});
     const url = URL.createObjectURL(blob);
@@ -30,51 +35,24 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
   };
 
   const handlePngJpegExport = () => {
-    // Create a canvas element
-    const canvas = document.createElement('canvas');
-    canvas.width = 600; // Increased width
-    canvas.height = 300; // Increased height
-    const ctx = canvas.getContext('2d');
-  
-    if (!ctx) {
-      alert("Canvas context not supported!");
+    const canvasElement = document.querySelector('canvas');
+    if (!canvasElement) {
+      alert("Canvas not found!");
       return;
     }
-  
-    // Set background color to white (or any preferred color)
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-    // Set font properties
-    ctx.font = `30px ${selectedFont || 'Arial'}`; // Increased font size
-    ctx.fillStyle = 'black';
-        ctx.font = `${bold ? 'bold ' : ''}${italic ? 'italic ' : ''}30px ${selectedFont || 'Arial'}`;
-    ctx.textBaseline = 'middle'; // Align text vertically
-    ctx.letterSpacing = `${kerning / 100}em`;
 
-    // Calculate the middle point of the canvas
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-  
-    // Draw the text onto the canvas
-    ctx.fillText(text, centerX, centerY);
-  
-    canvas.toBlob((blob) => {
-      if (blob === null) {
-        console.error("Failed to create blob");
-        return;
-      }
-  
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'TypeForge_export.png';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-  
-    }, 'image/png'); // You can change to 'image/jpeg' if needed
+    const fabricCanvas = new fabric.Canvas(canvasElement);
+    const dataURL = fabricCanvas.toDataURL({
+      format: 'png',
+      quality: 0.8
+    });
+
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'TypeForge_export.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
