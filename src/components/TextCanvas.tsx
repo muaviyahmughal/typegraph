@@ -6,9 +6,12 @@ interface TextCanvasProps {
   selectedFont: string | null;
   text: string;
   onTextChange: (newText: string) => void;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
 }
 
-export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTextChange}) => {
+export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTextChange, bold, italic, underline}) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onTextChange(e.target.value);
   };
@@ -21,6 +24,12 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         value={text}
         onChange={handleChange}
         placeholder="Enter text here..."
+        style={{
+          fontFamily: selectedFont || 'sans-serif',
+          fontWeight: bold ? 'bold' : 'normal',
+          fontStyle: italic ? 'italic' : 'normal',
+          textDecoration: underline ? 'underline' : 'none',
+        }}
       />
       <p className="mt-2">
         Selected Font: {selectedFont || 'Default'}
@@ -28,4 +37,3 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
     </div>
   );
 };
-

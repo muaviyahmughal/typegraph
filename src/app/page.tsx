@@ -6,10 +6,14 @@ import {EffectControls} from '@/components/EffectControls';
 import {FontControls} from '@/components/FontControls';
 import {Sidebar} from '@/components/ui/sidebar';
 import {ModeToggle} from '@/components/ModeToggle';
+import {ExportControls} from '@/components/ExportControls';
 
 export default function Home() {
   const [selectedFont, setSelectedFont] = useState<string | null>(null);
   const [text, setText] = useState<string>('TypeForge');
+    const [bold, setBold] = useState(false);
+  const [italic, setItalic] = useState(false);
+  const [underline, setUnderline] = useState(false);
 
   return (
     <div className="flex h-screen w-full">
@@ -19,13 +23,24 @@ export default function Home() {
           <ModeToggle />
         </div>
         <FontControls onFontSelect={setSelectedFont} />
-        <EffectControls />
+            <EffectControls
+            onBoldChange={setBold}
+            onItalicChange={setItalic}
+            onUnderlineChange={setUnderline}
+          />
+                  <ExportControls text={text} selectedFont={selectedFont} />
       </Sidebar>
 
       <main className="flex-1 p-4">
-        <TextCanvas selectedFont={selectedFont} text={text} onTextChange={setText} />
+              <TextCanvas
+            selectedFont={selectedFont}
+            text={text}
+            onTextChange={setText}
+            bold={bold}
+            italic={italic}
+            underline={underline}
+          />
       </main>
     </div>
   );
 }
-
