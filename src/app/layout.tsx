@@ -1,8 +1,9 @@
-import type {Metadata} from 'next';
-import {Geist, Geist_Mono} from 'next/font/google';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import {Toaster} from '@/components/ui/toaster';
-import {SidebarProvider} from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/toaster';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { ThemeProvider } from '@/components/theme-provider'; // Import the new client component wrapper
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,14 +26,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SidebarProvider>
-          {children}
-          <Toaster />
-        </SidebarProvider>
+        {/* Use the new ThemeProvider client component */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SidebarProvider>
+            {children}
+            <Toaster />
+          </SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
-
