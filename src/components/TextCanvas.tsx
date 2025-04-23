@@ -20,6 +20,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({ selectedFont, text, onTe
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isResizing, setIsResizing] = useState(false);
   const [resizeAnchor, setResizeAnchor] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -58,7 +59,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({ selectedFont, text, onTe
     // Bottom-right
     ctx.fillRect(position.x + size.width - anchorSize, position.y + size.height - anchorSize, anchorSize * 2, anchorSize * 2);
 
-  }, [selectedFont, text, bold, italic, underline, kerning, position, size]);
+  }, [selectedFont, text, bold, italic, underline, kerning, position, size, isEditing]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -146,19 +147,62 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({ selectedFont, text, onTe
     }
   };
 
+    const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Check if mouse is inside the bounding box
+        if (mouseX >= position.x && mouseX <= position.x + size.width &&
+            mouseY >= position.y && mouseY <= position.y + size.height) {
+            setIsEditing(true);
+        }
+    };
+
+    const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        onTextChange(e.target.value);
+    };
+
+    const handleBlur = () => {
+        setIsEditing(false);
+    };
+
   return (
     <div className="flex flex-col h-full border rounded-md p-4">
       <h2 className="text-xl font-semibold mb-2">Text Canvas</h2>
-      <canvas
-        ref={canvasRef}
-        width={600}  // Set a fixed width
-        height={300} // Set a fixed height
-        style={{ border: '1px solid black', cursor: isDragging ? 'grabbing' : 'default' }}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseUp}
-      />
+          <canvas
+              ref={canvasRef}
+              width={600}  // Set a fixed width
+              height={300} // Set a fixed height
+              style={{ border: '1px solid black', cursor: isDragging || isResizing ? 'grabbing' : 'default', display: isEditing ? 'none' : 'block' }}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseUp}
+              onDoubleClick={handleDoubleClick}
+          />
+          {isEditing && (
+              <textarea
+                  className="flex-grow w-full border rounded-md p-2 resize-none absolute top-16 left-4"
+                  value={text}
+                  onChange={handleTextChange}
+                  onBlur={handleBlur}
+                  style={{
+                      fontFamily: selectedFont || 'sans-serif',
+                      fontWeight: bold ? 'bold' : 'normal',
+                      fontStyle: italic ? 'italic' : 'normal',
+                      textDecoration: underline ? 'underline' : 'none',
+                      position: 'absolute',
+                      top: position.y + 16,
+                      left: position.x + 4,
+                      width: size.width,
+                      height: size.height,
+                  }}
+              />
+          )}
     </div>
   );
 };
