@@ -8,6 +8,16 @@ import { Label } from "@/components/ui/label";
 import { getSystemFonts, Font as SystemFont } from '@/services/font-service';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form"
+import { Switch } from "@/components/ui/switch"
+import { useForm } from "react-hook-form"
 
 // Interface for axis data extracted from opentype.js
 interface FontAxis {
@@ -29,9 +39,15 @@ interface DisplayFont {
 interface FontControlsProps {
   onFontSelect: (font: string | null) => void;
   onVariableSettingsChange?: (settings: Record<string, number> | null) => void;
+  onBoldChange: (bold: boolean) => void;
+  onItalicChange: (italic: boolean) => void;
+  onUnderlineChange: (underline: boolean) => void;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVariableSettingsChange }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVariableSettingsChange, onBoldChange, onItalicChange, onUnderlineChange, bold, italic, underline }) => {
   const [systemFonts, setSystemFonts] = useState<SystemFont[]>([]);
   const [uploadedFonts, setUploadedFonts] = useState<DisplayFont[]>([]);
   const [allFonts, setAllFonts] = useState<DisplayFont[]>([]);
@@ -39,6 +55,29 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
   const [currentWeight, setCurrentWeight] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+    const form = useForm({
+    defaultValues: {
+      bold: bold,
+      italic: italic,
+      underline: underline,
+    },
+  })
+
+  function handleBoldChange(value: boolean) {
+    form.setValue("bold", value);
+    onBoldChange(value);
+  }
+
+  function handleItalicChange(value: boolean) {
+    form.setValue("italic", value);
+    onItalicChange(value);
+  }
+
+  function handleUnderlineChange(value: boolean) {
+    form.setValue("underline", value);
+    onUnderlineChange(value);
+  }
 
   // Fetch system fonts
   useEffect(() => {
@@ -216,6 +255,61 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
           />
         </div>
       )}
+
+            <Accordion type="single" collapsible>
+      <AccordionItem value="textProperties">
+          <AccordionTrigger>Text Properties</AccordionTrigger>
+          <AccordionContent>
+          <Form {...form}>
+      <FormField
+        control={form.control}
+        name="bold"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormLabel>Bold</FormLabel>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={handleBoldChange}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="italic"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormLabel>Italic</FormLabel>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={handleItalicChange}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+            <FormField
+        control={form.control}
+        name="underline"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormLabel>Underline</FormLabel>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={handleUnderlineChange}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+    </Form>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       {/* Font Upload Section */}
       <input

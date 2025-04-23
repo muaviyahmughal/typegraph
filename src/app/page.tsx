@@ -2,7 +2,6 @@
 
 import React, {useState} from 'react';
 import {TextCanvas} from '@/components/TextCanvas';
-import {EffectControls} from '@/components/EffectControls';
 import {FontControls} from '@/components/FontControls';
 import {Sidebar} from '@/components/ui/sidebar';
 import {ModeToggle} from '@/components/ModeToggle';
@@ -30,14 +29,17 @@ export default function Home() {
             <TabsTrigger value="export">Export</TabsTrigger>
           </TabsList>
           <TabsContent value="font">
-            <FontControls onFontSelect={setSelectedFont} />
-          </TabsContent>
-          <TabsContent value="effects">
-            <EffectControls
+            <FontControls
+              onFontSelect={setSelectedFont}
               onBoldChange={setBold}
               onItalicChange={setItalic}
               onUnderlineChange={setUnderline}
+              bold={bold}
+              italic={italic}
+              underline={underline}
             />
+          </TabsContent>
+          <TabsContent value="effects">
           </TabsContent>
           <TabsContent value="export">
             <ExportControls text={text} selectedFont={selectedFont} />
@@ -58,3 +60,4 @@ export default function Home() {
     </div>
   );
 }
+
