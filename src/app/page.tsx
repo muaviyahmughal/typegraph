@@ -5,8 +5,8 @@ import {TextCanvas} from '@/components/TextCanvas';
 import {FontControls} from '@/components/FontControls';
 import {Sidebar} from '@/components/ui/sidebar';
 import {ModeToggle} from '@/components/ModeToggle';
-import {ExportControls} from '@/components/ExportControls';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {ExportControls} from "@/components/ExportControls";
 
 export default function Home() {
   const [selectedFont, setSelectedFont] = useState<string | null>(null);
@@ -14,6 +14,7 @@ export default function Home() {
   const [bold, setBold] = useState(false);
   const [italic, setItalic] = useState(false);
   const [underline, setUnderline] = useState(false);
+    const [kerning, setKerning] = useState<number>(0);
 
   return (
     <div className="flex h-screen w-full">
@@ -34,6 +35,7 @@ export default function Home() {
               onBoldChange={setBold}
               onItalicChange={setItalic}
               onUnderlineChange={setUnderline}
+              onKerningChange={setKerning}
               bold={bold}
               italic={italic}
               underline={underline}
@@ -42,7 +44,7 @@ export default function Home() {
           <TabsContent value="effects">
           </TabsContent>
           <TabsContent value="export">
-            <ExportControls text={text} selectedFont={selectedFont} />
+            <ExportControls text={text} selectedFont={selectedFont} bold={bold} italic={italic} underline={underline} kerning={kerning} />
           </TabsContent>
         </Tabs>
       </Sidebar>
@@ -55,9 +57,9 @@ export default function Home() {
           bold={bold}
           italic={italic}
           underline={underline}
+          kerning={kerning}
         />
       </main>
     </div>
   );
 }
-

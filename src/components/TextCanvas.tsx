@@ -10,9 +10,10 @@ interface TextCanvasProps {
   bold: boolean;
   italic: boolean;
   underline: boolean;
+  kerning: number;
 }
 
-export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTextChange, bold, italic, underline}) => {
+export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTextChange, bold, italic, underline, kerning}) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onTextChange(e.target.value);
   };
@@ -30,6 +31,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
           fontWeight: bold ? 'bold' : 'normal',
           fontStyle: italic ? 'italic' : 'normal',
           textDecoration: underline ? 'underline' : 'none',
+          letterSpacing: `${kerning / 100}em`,
         }}
       />
     </div>

@@ -42,17 +42,19 @@ interface FontControlsProps {
   onBoldChange: (bold: boolean) => void;
   onItalicChange: (italic: boolean) => void;
   onUnderlineChange: (underline: boolean) => void;
+  onKerningChange: (kerning: number) => void;
   bold: boolean;
   italic: boolean;
   underline: boolean;
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVariableSettingsChange, onBoldChange, onItalicChange, onUnderlineChange, bold, italic, underline }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVariableSettingsChange, onBoldChange, onItalicChange, onUnderlineChange, onKerningChange, bold, italic, underline }) => {
   const [systemFonts, setSystemFonts] = useState<SystemFont[]>([]);
   const [uploadedFonts, setUploadedFonts] = useState<DisplayFont[]>([]);
   const [allFonts, setAllFonts] = useState<DisplayFont[]>([]);
   const [selectedFontInfo, setSelectedFontInfo] = useState<DisplayFont | null>(null);
   const [currentWeight, setCurrentWeight] = useState<number | null>(null);
+  const [kerning, setKerning] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -134,6 +136,11 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
   const handleUploadButtonClick = () => {
     fileInputRef.current?.click();
   };
+
+    const handleKerningChange = (value: number[]) => {
+        setKerning(value[0]);
+        onKerningChange(value[0]);
+    };
 
   // Handle File Upload and Parsing
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -305,6 +312,18 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
             </FormControl>
           </FormItem>
         )}
+              />
+              <div className="space-y-2">
+                  <Label htmlFor="kerning-slider">Kerning ({kerning})</Label>
+                  <Slider
+                      id="kerning-slider"
+                      min={-100}
+                      max={100}
+                      step={1}
+                      value={[kerning]}
+                      onValueChange={handleKerningChange}
+                  />
+              </div>
       />
     </Form>
           </AccordionContent>

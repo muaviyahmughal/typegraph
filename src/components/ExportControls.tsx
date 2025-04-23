@@ -4,14 +4,18 @@ import {Button} from "@/components/ui/button";
 interface ExportControlsProps {
   text: string;
   selectedFont: string | null;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  kerning: number;
 }
 
-export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFont}) => {
+export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFont, bold, italic, underline, kerning}) => {
 
   const handleSvgExport = () => {
     // Create SVG content
     const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">
-      <text x="10" y="50" font-family="${selectedFont || 'Arial'}" font-size="20">${text}</text>
+      <text x="10" y="50" font-family="${selectedFont || 'Arial'}" font-size="20" font-weight="${bold ? 'bold' : 'normal'}" font-style="${italic ? 'italic' : 'normal'}" text-decoration="${underline ? 'underline' : 'none'}" letter-spacing="${kerning / 100}em">${text}</text>
     </svg>`;
 
     const blob = new Blob([svgContent], {type: 'image/svg+xml'});
@@ -44,9 +48,10 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
     // Set font properties
     ctx.font = `30px ${selectedFont || 'Arial'}`; // Increased font size
     ctx.fillStyle = 'black';
-    ctx.textAlign = 'center'; // Center the text
+        ctx.font = `${bold ? 'bold ' : ''}${italic ? 'italic ' : ''}30px ${selectedFont || 'Arial'}`;
     ctx.textBaseline = 'middle'; // Align text vertically
-  
+    ctx.letterSpacing = `${kerning / 100}em`;
+
     // Calculate the middle point of the canvas
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
