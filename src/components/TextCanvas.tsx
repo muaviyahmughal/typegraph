@@ -14,10 +14,10 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
   };
 
   return (
-    <div className="border rounded-md p-4">
+    <div className="flex flex-col h-full border rounded-md p-4">
       <h2 className="text-xl font-semibold mb-2">Text Canvas</h2>
       <textarea
-        className="w-full h-48 border rounded-md p-2 resize-none"
+        className="flex-grow w-full border rounded-md p-2 resize-none"
         value={text}
         onChange={handleChange}
         placeholder="Enter text here..."
