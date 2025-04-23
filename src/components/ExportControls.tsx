@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button} from "@/components/ui/button";
-import {fabric} from 'fabric';
+import { fabric } from 'fabric';
 
 interface ExportControlsProps {
   text: string;
