@@ -41,13 +41,13 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({ selectedFont, text, onTe
     ctx.fillText(text, position.x, position.y);
 
     // Draw bounding box
-    ctx.strokeStyle = 'blue';
+    ctx.strokeStyle = 'rgba(0, 0, 255, 0.3)'; // Subtle blue
     ctx.lineWidth = 1;
     ctx.strokeRect(position.x, position.y, size.width, size.height);
 
     // Draw resize anchors
     const anchorSize = 5;
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Subtle red
 
     // Top-left
     ctx.fillRect(position.x - anchorSize, position.y - anchorSize, anchorSize * 2, anchorSize * 2);
