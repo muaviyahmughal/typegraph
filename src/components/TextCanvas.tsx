@@ -64,13 +64,6 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         textDecoration: underline ? 'underline' : '',
         charSpacing: kerning, // Kerning
         fontSize: 30,
-        // lockUniScaling: true, // Keep aspect ratio during scaling
-        // cornerStyle: 'circle',
-        // cornerSize: 10,
-        // transparentCorners: false,
-        // borderColor: 'rgba(100,100,200,0.8)',
-        // cornerColor: 'rgba(100,200,200,0.8)',
-        // rotatingPointOffset: 25
       });
       fabricCanvas.add(textObject);
       fabricCanvas.setActiveObject(textObject);
