@@ -54,7 +54,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
   const [allFonts, setAllFonts] = useState<DisplayFont[]>([]);
   const [selectedFontInfo, setSelectedFontInfo] = useState<DisplayFont | null>(null);
   const [currentWeight, setCurrentWeight] = useState<number | null>(null);
-  const [kerning, setKerning] = useState<number>(0);
+  const [kerningValue, setKerningValue] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -65,6 +65,18 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
       underline: underline,
     },
   })
+
+  useEffect(() => {
+      form.setValue("bold", bold);
+  }, [bold, form])
+
+  useEffect(() => {
+      form.setValue("italic", italic);
+  }, [italic, form])
+
+    useEffect(() => {
+        form.setValue("underline", underline);
+    }, [underline, form])
 
   function handleBoldChange(value: boolean) {
     form.setValue("bold", value);
@@ -138,7 +150,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
   };
 
     const handleKerningChange = (value: number[]) => {
-        setKerning(value[0]);
+        setKerningValue(value[0]);
         onKerningChange(value[0]);
     };
 
@@ -314,13 +326,13 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
         )}
               />
               <div className="space-y-2">
-                  <Label htmlFor="kerning-slider">Kerning ({kerning})</Label>
+                  <Label htmlFor="kerning-slider">Kerning ({kerningValue})</Label>
                   <Slider
                       id="kerning-slider"
                       min={-100}
                       max={100}
                       step={1}
-                      value={[kerning]}
+                      value={[kerningValue]}
                       onValueChange={handleKerningChange}
                   />
               </div>
