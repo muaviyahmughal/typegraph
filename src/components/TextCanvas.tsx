@@ -62,7 +62,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         fontWeight: bold ? 'bold' : 'normal',
         fontStyle: italic ? 'italic' : 'normal',
         textDecoration: underline ? 'underline' : '',
-        letterSpacing: kerning / 100,
+        charSpacing: kerning, // Kerning
         fontSize: 30,
         // lockUniScaling: true, // Keep aspect ratio during scaling
         // cornerStyle: 'circle',
@@ -96,7 +96,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         fontWeight: bold ? 'bold' : 'normal',
         fontStyle: italic ? 'italic' : 'normal',
         textDecoration: underline ? 'underline' : '',
-        letterSpacing: kerning / 100,
+        charSpacing: kerning, // Kerning
       });
       canvas.requestRenderAll();
     }
