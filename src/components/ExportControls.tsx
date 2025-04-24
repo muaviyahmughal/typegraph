@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Button} from "@/components/ui/button";
 import * as fabric from 'fabric';
 import { saveAs } from 'file-saver';
+import Select from 'react-select';
 
 interface ExportControlsProps {
   text: string;
+  canvas: fabric.Canvas | null;
   selectedFont: string | null;
   bold: boolean;
   italic: boolean;
@@ -12,47 +14,62 @@ interface ExportControlsProps {
   kerning: number;
 }
 
-export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFont, bold, italic, underline, kerning}) => {
+interface Option {
+  value: 'svg' | 'png' | 'jpeg';
+  label: string;
+}
 
-  const handleSvgExport = () => {
-    const canvasElement = document.querySelector('canvas');
-    if (!canvasElement) {
-      alert("Canvas not found!");
-      return;
+const options: Option[] = [
+  { value: 'svg', label: 'SVG' },
+  { value: 'png', label: 'PNG' },
+  { value: 'jpeg', label: 'JPEG' },
+];
+
+export const ExportControls: React.FC<ExportControlsProps> = ({ canvas, text, selectedFont, bold, italic, underline, kerning }) => {
+  const [selectedFormat, setSelectedFormat] = useState<Option>(options[1]); 
+
+  const handleExport = () => {
+    if (!canvas) {
+      alert("Canvas not ready!");
+      return; 
     }
-
-    const fabricCanvas = new fabric.Canvas(canvasElement);
-    const svgContent = fabricCanvas.toSVG();
-
-    const blob = new Blob([svgContent], {type: 'image/svg+xml'});
-    saveAs(blob, 'TypeForge_export.svg');
-    fabricCanvas.dispose();
-  };
-
-  const handlePngJpegExport = () => {
-    const canvasElement = document.querySelector('canvas');
-    if (!canvasElement) {
-      alert("Canvas not found!");
-      return;
+    
+    if (selectedFormat.value === 'svg') {
+      const svgContent = canvas.toSVG();
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      saveAs(blob, 'TypeForge_export.svg');
+    } else if (selectedFormat.value === 'png') {
+      const dataURL = canvas.toDataURL({
+        format: 'png',
+        quality: 1,
+      });
+      const byteString = atob(dataURL.split(',')[1]);
+      const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: mimeString });
+      saveAs(blob, 'TypeForge_export.png');
+    } else if (selectedFormat.value === 'jpeg') {
+        const dataURL = canvas.toDataURL({ format: 'jpeg', quality: 1 });
+        const byteString = atob(dataURL.split(',')[1]);
+        const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
+        const blob = new Blob([ab], { type: mimeString });
+        saveAs(blob, 'TypeForge_export.jpeg');
     }
+  }
 
-    const fabricCanvas = new fabric.Canvas(canvasElement);
-    const dataURL = fabricCanvas.toDataURL({
-      format: 'png',
-      quality: 0.8
-    });
-
-    const blob = new Blob([dataURL], { type: 'image/png' });
-    saveAs(blob, 'TypeForge_export.png');
-
-    fabricCanvas.dispose();
-  };
-
+  
   return (
-    <div>
+    <div className='flex flex-col gap-4'>
       <h2 className="text-lg font-semibold mb-2">Export</h2>
-      <Button onClick={handleSvgExport} className="mb-2">Export as SVG</Button>
-      <Button onClick={handlePngJpegExport}>Export as PNG/JPEG</Button>
+      <Select options={options} defaultValue={selectedFormat} onChange={setSelectedFormat} className="basic-single" classNamePrefix="select"/>
+      <Button onClick={handleExport}>Export</Button>
     </div>
   );
 };
