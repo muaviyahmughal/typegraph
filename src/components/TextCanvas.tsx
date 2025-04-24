@@ -102,10 +102,18 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
     }
   }, [text, canvas, activeObject]);
 
+    useEffect(() => {
+        if (canvas) {
+            canvas.setWidth(canvasRef.current?.clientWidth || 600);
+            canvas.setHeight(canvasRef.current?.clientHeight || 300);
+            canvas.requestRenderAll();
+        }
+    }, [canvas]);
+
   return (
-    <div className="flex flex-col h-full border rounded-md p-4">
+    <div className="flex flex-col h-full border rounded-md p-4 w-full">
       <h2 className="text-xl font-semibold mb-2">Text Canvas</h2>
-      <canvas ref={canvasRef} width={600} height={300} style={{border: '1px solid black'}}/>
+      <canvas ref={canvasRef} width={600} height={300} style={{border: '1px solid black', flex: '1'}}/>
     </div>
   );
 };
