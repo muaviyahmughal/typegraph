@@ -64,7 +64,6 @@ export const ExportControls: React.FC<ExportControlsProps> = ({ canvas, text, se
     }
   }
 
-  
   return (
     <div className='flex flex-col gap-4'>
       <h2 className="text-lg font-semibold mb-2">Export</h2>
