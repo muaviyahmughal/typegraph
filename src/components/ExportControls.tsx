@@ -1,6 +1,7 @@
 import React from 'react';
 import {Button} from "@/components/ui/button";
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
+import { saveAs } from 'file-saver';
 
 interface ExportControlsProps {
   text: string;
@@ -24,14 +25,8 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
     const svgContent = fabricCanvas.toSVG();
 
     const blob = new Blob([svgContent], {type: 'image/svg+xml'});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'TypeForge_export.svg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    saveAs(blob, 'TypeForge_export.svg');
+    fabricCanvas.dispose();
   };
 
   const handlePngJpegExport = () => {
@@ -47,13 +42,10 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
       quality: 0.8
     });
 
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = 'TypeForge_export.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const blob = new Blob([dataURL], { type: 'image/png' });
+    saveAs(blob, 'TypeForge_export.png');
+
+    fabricCanvas.dispose();
   };
 
   return (
@@ -64,4 +56,3 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
     </div>
   );
 };
-
