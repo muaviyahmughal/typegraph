@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button} from "@/components/ui/button";
-import { fabric } from 'fabric';
-
+import * as fabric from 'fabric';
+  
 interface ExportControlsProps {
   text: string;
   selectedFont: string | null;
@@ -20,7 +20,10 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
       return;
     }
 
-    const fabricCanvas = new fabric.Canvas(canvasElement);
+    const fabricCanvas = new fabric.Canvas(canvasElement, {
+      width: canvasElement.width,
+      height: canvasElement.height,
+    });
     const svgContent = fabricCanvas.toSVG();
 
     const blob = new Blob([svgContent], {type: 'image/svg+xml'});
@@ -41,7 +44,10 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
       return;
     }
 
-    const fabricCanvas = new fabric.Canvas(canvasElement);
+    const fabricCanvas = new fabric.Canvas(canvasElement, {
+      width: canvasElement.width,
+      height: canvasElement.height,
+    });
     const dataURL = fabricCanvas.toDataURL({
       format: 'png',
       quality: 0.8
@@ -53,7 +59,6 @@ export const ExportControls: React.FC<ExportControlsProps> = ({text, selectedFon
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   return (

@@ -42,6 +42,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "fabric": "^6.0.0-beta.8",
+    "file-saver": "^2.0.5",
     "firebase": "^11.3.0",
     "genkit": "^1.0.4",
     "lucide-react": "^0.475.0",
