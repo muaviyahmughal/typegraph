@@ -1,6 +1,7 @@
 "use client";
 
 import React, {useState} from 'react';
+import Image from 'next/image';
 import * as fabric from 'fabric';
 import {TextCanvas} from '@/components/TextCanvas';
 import {FontControls} from '@/components/FontControls';
@@ -11,7 +12,7 @@ import {ExportControls} from "@/components/ExportControls";
 
 export default function Home() {
   const [selectedFont, setSelectedFont] = useState<string | null>(null);
-  const [text, setText] = useState<string>('TypeForge');
+  const [text, setText] = useState<string>('Typegraph');
   const [bold, setBold] = useState(false);
   const [italic, setItalic] = useState(false);
   const [underline, setUnderline] = useState(false);
@@ -26,7 +27,16 @@ export default function Home() {
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar className="w-64 flex-none p-4 overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">TypeForge</h1>
+          <div className="flex items-center">
+            <Image 
+              src="/assets/images/tg-logo.svg"
+              alt="Typegraph"
+              width={120}
+              height={32}
+              priority
+              className="dark:invert"
+            />
+          </div>
           <ModeToggle />
         </div>
         <Tabs defaultValue="font" className="w-full">
