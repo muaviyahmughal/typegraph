@@ -19,6 +19,12 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [activeObject, setActiveObject] = useState<fabric.Object | null>(null);
+  const onTextChangeRef = useRef(onTextChangeAction);
+
+  // Keep ref updated with latest callback
+  useEffect(() => {
+    onTextChangeRef.current = onTextChangeAction;
+  }, [onTextChangeAction]);
 
   useEffect(() => {
     const initializeCanvas = () => {
@@ -69,6 +75,22 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         }
       });
 
+      // Handle text changes
+      fabricCanvas.on('text:changed', (e: any) => {
+        if (e.target && e.target.type === 'i-text') {
+          const textObject = e.target as fabric.IText;
+          onTextChangeRef.current(textObject.text);
+        }
+      });
+
+      // Subscribe to text editing events
+      fabricCanvas.on('text:editing:exited', (e: any) => {
+        if (e.target && e.target.type === 'i-text') {
+          const textObject = e.target as fabric.IText;
+          onTextChangeRef.current(textObject.text);
+        }
+      });
+
       // Add initial text object
       const textObject = new fabric.IText(text, {
         left: 50,
@@ -95,7 +117,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         cleanup();
       }
     };
-  }, []);
+  }, []); // No dependencies needed since we're using refs
 
   useEffect(() => {
     if (canvas && activeObject && activeObject.type === 'i-text') {
