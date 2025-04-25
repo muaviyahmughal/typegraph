@@ -37,18 +37,18 @@ interface DisplayFont {
 }
 
 interface FontControlsProps {
-  onFontSelect: (font: string | null) => void;
-  onVariableSettingsChange?: (settings: Record<string, number> | null) => void;
-  onBoldChange: (bold: boolean) => void;
-  onItalicChange: (italic: boolean) => void;
-  onUnderlineChange: (underline: boolean) => void;
-  onKerningChange: (kerning: number) => void;
+  onFontSelectAction: (font: string | null) => void;
+  onVariableSettingsChangeAction?: (settings: Record<string, number> | null) => void;
+  onBoldChangeAction: (bold: boolean) => void;
+  onItalicChangeAction: (italic: boolean) => void;
+  onUnderlineChangeAction: (underline: boolean) => void;
+  onKerningChangeAction: (kerning: number) => void;
   bold: boolean;
   italic: boolean;
   underline: boolean;
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVariableSettingsChange, onBoldChange, onItalicChange, onUnderlineChange, onKerningChange, bold, italic, underline }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ onFontSelectAction, onVariableSettingsChangeAction, onBoldChangeAction, onItalicChangeAction, onUnderlineChangeAction, onKerningChangeAction, bold, italic, underline }) => {
   const [systemFonts, setSystemFonts] = useState<SystemFont[]>([]);
   const [uploadedFonts, setUploadedFonts] = useState<DisplayFont[]>([]);
   const [allFonts, setAllFonts] = useState<DisplayFont[]>([]);
@@ -80,17 +80,17 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
 
   function handleBoldChange(value: boolean) {
     form.setValue("bold", value);
-    onBoldChange(value);
+    onBoldChangeAction(value);
   }
 
   function handleItalicChange(value: boolean) {
     form.setValue("italic", value);
-    onItalicChange(value);
+    onItalicChangeAction(value);
   }
 
   function handleUnderlineChange(value: boolean) {
     form.setValue("underline", value);
-    onUnderlineChange(value);
+    onUnderlineChangeAction(value);
   }
 
   // Fetch system fonts
@@ -119,18 +119,18 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
   // Effect to handle variable settings change
   useEffect(() => {
     if (selectedFontInfo?.axes?.wght && currentWeight !== null) {
-      onVariableSettingsChange?.({ 'wght': currentWeight });
+      onVariableSettingsChangeAction?.({ 'wght': currentWeight });
     } else {
       // Reset if font is not variable or no weight selected
-      onVariableSettingsChange?.(null);
+      onVariableSettingsChangeAction?.(null);
     }
-  }, [currentWeight, selectedFontInfo, onVariableSettingsChange]);
+  }, [currentWeight, selectedFontInfo, onVariableSettingsChangeAction]);
 
   // Handle font selection from dropdown
   const handleFontSelect = useCallback((fontName: string) => {
     const fontInfo = allFonts.find(f => f.name === fontName);
     setSelectedFontInfo(fontInfo || null);
-    onFontSelect(fontName);
+    onFontSelectAction(fontName);
 
     // Set initial weight if variable font with weight axis is selected
     if (fontInfo?.axes?.wght) {
@@ -138,7 +138,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
     } else {
       setCurrentWeight(null);
     }
-  }, [allFonts, onFontSelect]);
+  }, [allFonts, onFontSelectAction]);
 
   // Handle slider value change
   const handleWeightChange = (value: number[]) => {
@@ -151,7 +151,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
 
     const handleKerningChange = (value: number[]) => {
         setKerningValue(value[0]);
-        onKerningChange(value[0]);
+        onKerningChangeAction(value[0]);
     };
 
   // Handle File Upload and Parsing
@@ -189,7 +189,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
         const fontName = file.name.replace(/\.[^/.]+$/, "");
 
         if (allFonts.some(f => f.name.toLowerCase() === fontName.toLowerCase())) {
-          toast({ title: "Font Already Exists", description: `Font "${fontName}" is already available.`, variant: "warning" });
+          toast({ title: "Font Already Exists", description: `Font "${fontName}" is already available.`, variant: "destructive" });
           return; // Keep input value for reset later
         }
 
@@ -199,7 +199,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
         if (font.tables.fvar && font.tables.fvar.axes) {
           console.log(`Font "${fontName}" is a variable font.`);
           newFont.axes = {};
-          font.tables.fvar.axes.forEach((axis: opentype.VariationAxis) => {
+          font.tables.fvar.axes.forEach((axis: any) => {
             newFont.axes![axis.tag] = {
               tag: axis.tag,
               minValue: axis.minValue,
@@ -259,6 +259,22 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
           ))}
         </SelectContent>
       </Select>
+
+      {/* Font Upload Section */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept=".ttf,.otf,.woff,.woff2"
+        style={{ display: 'none' }}
+      />
+      <Button
+        variant="secondary"
+        className="w-full"
+        onClick={handleUploadButtonClick}
+      >
+        Upload Custom Font
+      </Button>
 
       {/* Variable Font Weight Slider (Conditional) */}
       {weightAxis && currentWeight !== null && (
@@ -342,21 +358,6 @@ export const FontControls: React.FC<FontControlsProps> = ({ onFontSelect, onVari
         </AccordionItem>
       </Accordion>
 
-      {/* Font Upload Section */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept=".ttf,.otf,.woff,.woff2"
-        style={{ display: 'none' }}
-      />
-      <Button
-        variant="secondary"
-        className="w-full"
-        onClick={handleUploadButtonClick}
-      >
-        Upload Custom Font
-      </Button>
     </div>
   );
 };

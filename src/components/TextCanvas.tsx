@@ -76,7 +76,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         fontFamily: selectedFont || 'Arial',
         fontWeight: bold ? 'bold' : 'normal',
         fontStyle: italic ? 'italic' : 'normal',
-        textDecoration: underline ? 'underline' : '',
+        underline: underline,
         charSpacing: kerning, // Kerning
         fontSize: 30,
       });
@@ -103,7 +103,7 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({selectedFont, text, onTex
         fontFamily: selectedFont || 'Arial',
         fontWeight: bold ? 'bold' : 'normal',
         fontStyle: italic ? 'italic' : 'normal',
-        textDecoration: underline ? 'underline' : '',
+        underline: underline,
         charSpacing: kerning, // Kerning
       });
       canvas.requestRenderAll();

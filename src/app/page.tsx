@@ -37,11 +37,11 @@ export default function Home() {
           </TabsList>
           <TabsContent value="font">
             <FontControls
-              onFontSelect={setSelectedFont}
-              onBoldChange={setBold}
-              onItalicChange={setItalic}
-              onUnderlineChange={setUnderline}
-              onKerningChange={setKerning}
+              onFontSelectAction={setSelectedFont}
+              onBoldChangeAction={setBold}
+              onItalicChangeAction={setItalic}
+              onUnderlineChangeAction={setUnderline}
+              onKerningChangeAction={setKerning}
               bold={bold}
               italic={italic}
               underline={underline}
